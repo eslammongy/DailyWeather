@@ -1,3 +1,4 @@
+import 'package:daily_weather/screens/search/search_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 
@@ -9,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-
   bool _isServiceEnabled = false;
   late PermissionStatus _permissionStatus;
   //late LocationData _locationData;
@@ -19,7 +19,11 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return const SearchScreen();
+              }));
+            },
             icon: const Icon(Icons.search),
           ),
         ],
@@ -52,8 +56,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(10)),
                 child: InkWell(
                   onTap: (() {
-                  checkUserLocationServices();
-  }),
+                    checkUserLocationServices();
+                  }),
                   child: const Text(
                     'Get Location',
                     textAlign: TextAlign.center,
@@ -68,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<void> checkUserLocationServices()async {
+  Future<void> checkUserLocationServices() async {
     Location userLocation = Location();
     _isServiceEnabled = await userLocation.serviceEnabled();
     if (_isServiceEnabled) {
@@ -86,11 +90,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> checkUserLocationPermission(Location location)async{
+  Future<void> checkUserLocationPermission(Location location) async {
     _permissionStatus = await location.hasPermission();
     if (_permissionStatus == PermissionStatus.granted) {
       print("Location Permission Accept");
-     // _locationData = await location.getLocation();
+      // _locationData = await location.getLocation();
       location.onLocationChanged.listen((event) {
         print("${event.latitude} ${event.longitude}");
       });

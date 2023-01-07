@@ -1,6 +1,10 @@
 import 'package:daily_weather/screens/search/search_screen.dart';
+import 'package:daily_weather/utils/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+
+import '../../services/weather_services.dart';
+import '../../utils/utils.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,9 +14,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isServiceEnabled = false;
-  late PermissionStatus _permissionStatus;
-  //late LocationData _locationData;
+  final bool _isServiceEnabled = false;
+  WeatherServices services = WeatherServices();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return const SearchScreen();
+                return SearchScreen();
               }));
             },
             icon: const Icon(Icons.search),
@@ -55,8 +59,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Colors.blue[700],
                     borderRadius: BorderRadius.circular(10)),
                 child: InkWell(
-                  onTap: (() {
-                    checkUserLocationServices();
+                  onTap: (() async {
+                    LocationData locationData = await LocationService()
+                        .checkUserLocationServices(_isServiceEnabled);
+
+                    services.getCurrentWeatherByLocation(
+                        lat: locationData.latitude,
+                        long: locationData.longitude);
                   }),
                   child: const Text(
                     'Get Location',
@@ -70,45 +79,5 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     );
-  }
-
-  Future<void> checkUserLocationServices() async {
-    Location userLocation = Location();
-    _isServiceEnabled = await userLocation.serviceEnabled();
-    if (_isServiceEnabled) {
-      print("user location enabled");
-      checkUserLocationPermission(userLocation);
-    } else {
-      _isServiceEnabled = await userLocation.requestService();
-
-      if (_isServiceEnabled) {
-        print("Start access user location");
-        checkUserLocationPermission(userLocation);
-      } else {
-        return;
-      }
-    }
-  }
-
-  Future<void> checkUserLocationPermission(Location location) async {
-    _permissionStatus = await location.hasPermission();
-    if (_permissionStatus == PermissionStatus.granted) {
-      print("Location Permission Accept");
-      // _locationData = await location.getLocation();
-      location.onLocationChanged.listen((event) {
-        print("${event.latitude} ${event.longitude}");
-      });
-      //print("${_locationData.latitude} ${_locationData.longitude}");
-    } else {
-      _permissionStatus = await location.requestPermission();
-      if (_permissionStatus == PermissionStatus.granted) {
-        print("Permission Granted");
-        location.onLocationChanged.listen((event) {
-          print("${event.latitude} ${event.longitude}");
-        });
-      } else {
-        return;
-      }
-    }
   }
 }

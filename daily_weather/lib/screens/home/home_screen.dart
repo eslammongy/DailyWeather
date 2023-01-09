@@ -62,10 +62,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: (() async {
                     LocationData locationData = await LocationService()
                         .checkUserLocationServices(_isServiceEnabled);
-
-                    services.getCurrentWeatherByLocation(
+                    List list = await services.getCurrentWeatherByLocation(
                         lat: locationData.latitude,
                         long: locationData.longitude);
+                    print(list);
                   }),
                   child: const Text(
                     'Get Location',

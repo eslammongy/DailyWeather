@@ -33,8 +33,9 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.5
-  provider: ^6.0.5
   location: ^4.4.0
+  provider: ^6.0.5
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -68,7 +69,6 @@ flutter:
         - asset: assets/fonts/roboto_light.ttf
         - asset: assets/fonts/roboto_medium.ttf
         - asset: assets/fonts/roboto_bold.ttf
-
   #   - family: Trajan Pro
   #     fonts:
   #       - asset: fonts/TrajanPro.ttf

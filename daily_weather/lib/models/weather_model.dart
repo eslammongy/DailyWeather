@@ -1,6 +1,9 @@
+import 'dart:ffi';
+
 class WeatherModel {
   int? id;
   int? time;
+  String? dtTxt;
   int? sunrise;
   int? sunset;
   int? humidity;
@@ -26,6 +29,7 @@ class WeatherModel {
       this.cityName,
       this.windSpeed,
       this.temp,
+      this.dtTxt,
       this.maxTemp,
       this.minTemp,
       this.forecast});
@@ -35,6 +39,7 @@ class WeatherModel {
     return WeatherModel(
       id: weather['id'],
       time: json['dt'],
+      dtTxt: json['dt_txt'],
       description: weather['description'],
       iconCode: weather['icon'],
       main: weather['main'],
@@ -54,23 +59,14 @@ class WeatherModel {
     for (final item in json['list']) {
       weathers.add(WeatherModel(
         time: item['dt'],
-        cityName: item['name'],
+        dtTxt: item['dt_txt'],
         temp: item['main']['temp'],
         maxTemp: item['main']['temp_max'],
         minTemp: item['main']['temp_min'],
-        sunrise: item['sys']['sunrise'],
-        sunset: item['sys']['sunset'],
-        humidity: item['main']['humidity'],
-        windSpeed: item['wind']['speed'],
         description: item['weather'][0]['description'],
         main: item['weather'][0]['main'],
       ));
     }
     return weathers;
-  }
-
-  @override
-  String toString() {
-    return "Date $time Temp $temp";
   }
 }

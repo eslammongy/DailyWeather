@@ -1,9 +1,14 @@
+// ignore_for_file: avoid_print
+
+import 'package:daily_weather/models/weather_model.dart';
 import 'package:daily_weather/screens/search/search_screen.dart';
+import 'package:daily_weather/utils/location_prefs.dart';
 import 'package:daily_weather/utils/location_service.dart';
 import 'package:daily_weather/widgets/weather_info.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../services/weather_services.dart';
+import '../../providers/weather_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,22 +19,25 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final bool _isServiceEnabled = false;
-  WeatherServices services = WeatherServices();
-  final LocationService _locationService = LocationService();
-  double? latitude = 0.0;
-  double? longitude = 0.0;
+  late LocationService _locationService;
 
   @override
   void initState() {
     super.initState();
-    getLocationData();
+    initialLocationServices();
+    getCurrentLocationData();
+  }
+
+  getCurrentLocationData() async {
+    await Provider.of<WeatherProvider>(context, listen: false)
+        .getUserLocationData();
   }
 
   @override
   Widget build(BuildContext context) {
-    print("latitude BuildMethod:: $latitude");
-    print("longitude BuildMethod:: $longitude");
+    var provider = Provider.of<WeatherProvider>(context, listen: true);
 
+    //print("Provider -> ${provider.latitude}..${provider.longitude}");
     return Scaffold(
         appBar: AppBar(
           actions: [
@@ -44,70 +52,60 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
           title: const Text('DailyWeather'),
         ),
-        body: (latitude == 0.0)
+        body: provider.latitude == 0.0
             ? Center(
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'there is no weather 😔 start',
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
-                      ),
-                      const Text(
-                        'searching now 🔍 or give me access on your location please..',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 25,
-                        ),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 40),
-                        padding: const EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                            color: Colors.blue[700],
-                            borderRadius: BorderRadius.circular(10)),
-                        child: InkWell(
-                          onTap: (() async {
-                            if (latitude == 0.0 && longitude == 0.0) {
-                              _locationService
-                                  .checkUserLocationServices(_isServiceEnabled);
-                              print(
-                                  "latitude checkUserLocationServices:: $latitude");
-                              print(
-                                  "longitude checkUserLocationServices:: $longitude");
-                            } else {
-                              List list =
-                                  await services.getCurrentWeatherByLocation(
-                                      lat: latitude, long: longitude);
-                              print(list);
-                            }
-                          }),
-                          child: const Text(
-                            'Get Location',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 20, color: Colors.white),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          'searching now 🔍 or give me access on your location please 😔 to start..',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 25,
                           ),
                         ),
-                      )
-                    ],
-                  ),
-                ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 40),
+                          padding: const EdgeInsets.all(15),
+                          decoration: BoxDecoration(
+                              color: Colors.blue[700],
+                              borderRadius: BorderRadius.circular(10)),
+                          child: InkWell(
+                            onTap: (() async {
+                              if (provider.latitude == 0.0) {
+                                await _locationService
+                                    .checkUserLocationServices(
+                                        _isServiceEnabled)
+                                    .then((locationData) {
+                                  if (locationData.latitude != null) {
+                                    /*   print(
+                                        "Returned location data from dereferences"); */
+                                    provider.getUserLocationData();
+                                  }
+                                });
+                              }
+                            }),
+                            child: const Text(
+                              'Get Location',
+                              textAlign: TextAlign.center,
+                              style:
+                                  TextStyle(fontSize: 20, color: Colors.white),
+                            ),
+                          ),
+                        )
+                      ],
+                    )),
               )
-            : CurrentWeatherContainer());
+            : const CurrentWeatherContainer());
   }
 
-  getLocationData() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-
-    setState(() {
-      latitude = prefs.getDouble('LocationLatitude') ?? 0.0;
-      longitude = prefs.getDouble('LocationLongitude') ?? 0.0;
-    });
-    print("latitude getLocationData:: $latitude");
-    print("longitude getLocationData:: $longitude");
+  initialLocationServices() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    LocationPreferences locationPreferences =
+        LocationPreferences(sharedPreferences: sharedPreferences);
+    _locationService =
+        LocationService(locationPreferences: locationPreferences);
   }
 }

@@ -19,10 +19,12 @@ class WeatherServices {
       {required lat, required long}) async {
     Uri url = Uri.parse(
         "${baseUrl}forecast?lat=$lat&lon=$long&cnt=6&units=metric&appid=$ApiKey");
+    print(url);
     http_client.Response response = await http_client.get(url);
 
     Map<String, dynamic> result = jsonDecode(response.body);
     List<WeatherModel> dailyWeather = WeatherModel.fromForecastJson(result);
+
     return dailyWeather;
   }
 }

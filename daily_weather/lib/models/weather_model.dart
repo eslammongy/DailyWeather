@@ -10,7 +10,7 @@ class WeatherModel {
   String? iconCode;
   String? main;
   String? cityName;
-  double? windSpeed;
+  dynamic? windSpeed;
   double? temp;
   double? maxTemp;
   double? minTemp;
@@ -66,6 +66,7 @@ class WeatherModel {
           minTemp: item['main']['temp_min'],
           description: item['weather'][0]['description'],
           main: item['weather'][0]['main'],
+          iconCode: item['weather'][0]['icon'],
           humidity: item['main']['humidity'],
           windSpeed: item['wind']['speed'],
           sunrise: json['city']['sunrise'],

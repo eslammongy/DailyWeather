@@ -1,16 +1,19 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable
 
-import 'package:daily_weather/models/weather_model.dart';
-import 'package:daily_weather/providers/weather_provider.dart';
-import 'package:daily_weather/widgets/image_data.dart';
+import 'package:daily_weather/utils/utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import 'package:daily_weather/providers/weather_provider.dart';
+import 'package:daily_weather/widgets/image_data.dart';
 import '../utils/app_colors.dart';
 
 class CurrentWeatherContainer extends StatefulWidget {
-  const CurrentWeatherContainer({super.key});
+  String fetchMethod = "LatLang";
+  CurrentWeatherContainer({
+    Key? key,
+    required this.fetchMethod,
+  }) : super(key: key);
 
   @override
   State<CurrentWeatherContainer> createState() =>
@@ -18,15 +21,20 @@ class CurrentWeatherContainer extends StatefulWidget {
 }
 
 class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
+  String fetchMethod = "LatLang";
+  var today = DateTime.now();
+  var formattedDate = "Saturday, Jan,12";
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     var provider = Provider.of<WeatherProvider>(context);
 
     return FutureBuilder(
-      future: provider.getWeatherInfo(),
+      future: fetchMethod == 'LatLang'
+          ? provider.getWeatherInfoByLatLang()
+          : provider.getWeatherInfoByCityName(fetchMethod),
       builder: (context, snapshot) {
-        var dailyForecast = provider.weatherModels;
+        var dailyForecast = provider.listWeatherModel;
         if (snapshot.hasError) {
           return const Center(
             child: Text("Opps! Try again later!"),
@@ -44,7 +52,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: AppColor.snowWhite,
+                  color: Colors.grey[800],
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Column(
@@ -53,8 +61,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                   children: [
                     Text(
                       dailyForecast[0].cityName ?? 'Cairo',
-                      style: const TextStyle(
-                          color: AppColor.lightBlack, fontSize: 22),
+                      style: TextStyle(color: AppColor.titleBlue, fontSize: 22),
                     ),
                     Text(
                       DateFormat.MMMMEEEEd()
@@ -62,17 +69,18 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                       style:
                           const TextStyle(color: AppColor.grey, fontSize: 15),
                     ),
-                    Image.asset('assets/images/02n.png'),
+                    Image.asset(getImageCode(dailyForecast[0].iconCode!)),
                     Text(
                       dailyForecast[0].main ?? 'Cloudy',
-                      style: const TextStyle(
-                          color: AppColor.lightBlack, fontSize: 20),
+                      style: TextStyle(color: AppColor.titleBlue, fontSize: 20),
                     ),
                     SizedBox(height: size.height * 0.02),
                     Text(
                       "${dailyForecast[0].temp!.round().toString()}ºC",
-                      style:
-                          TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 45,
+                          color: AppColor.titleBlue,
+                          fontWeight: FontWeight.bold),
                     ),
                     // SizedBox(height: size.height * 0.02),
                     Row(
@@ -87,7 +95,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                           style: const TextStyle(
                               color: AppColor.grey, fontSize: 18),
                         ),
-                        const SizedBox(width: 40),
+                        const SizedBox(width: 80),
                         Image.asset(
                           'assets/images/l.png',
                           height: 35,
@@ -105,7 +113,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                       children: [
                         ImageData(
                           aseetPath: 'assets/images/w.png',
-                          data: '${dailyForecast[0].windSpeed.toString()}Km/h',
+                          data: '${dailyForecast[0].windSpeed!.round()}Km/h',
                           label: 'Wind',
                         ),
                         ImageData(
@@ -125,23 +133,24 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: 6,
+                  itemCount: dailyForecast.length - 1,
                   shrinkWrap: true,
                   physics: BouncingScrollPhysics(),
                   scrollDirection: Axis.horizontal,
                   itemBuilder: (BuildContext context, index) {
-                    var date = DateTime.fromMillisecondsSinceEpoch(
-                        dailyForecast[index].time! * 1000);
-                    var formattedDate = DateFormat.MMMMEEEEd().format(date);
+                    index += (index == dailyForecast.length - 1) ? 0 : 1;
+                    formattedDate = DateFormat.MMMMEEEEd()
+                        .format(today.add(Duration(days: index)))
+                        .toString();
 
                     return Container(
                       width: 200,
-                      height: size.height * 0.35,
+                      height: size.height * 0.3,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       margin: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(31, 162, 162, 162),
+                        color: Colors.grey[800],
                         borderRadius: BorderRadius.circular(15),
                       ),
                       child: Column(
@@ -150,23 +159,25 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                         children: [
                           Text(
                             formattedDate,
-                            style: const TextStyle(
-                                color: AppColor.lightBlack, fontSize: 15),
+                            style: TextStyle(
+                                color: AppColor.titleBlue, fontSize: 17),
                           ),
                           Image.asset(
-                            'assets/images/02n.png',
+                            getImageCode(dailyForecast[index].iconCode!),
                             width: 100,
                           ),
                           Text(
                             dailyForecast[index].main ?? 'Cloudy',
-                            style: const TextStyle(
-                                color: AppColor.lightBlack, fontSize: 20),
+                            style: TextStyle(
+                                color: AppColor.titleBlue, fontSize: 20),
                           ),
                           SizedBox(height: size.height * 0.02),
                           Text(
                             "${dailyForecast[index].temp!.round()}ºC",
                             style: TextStyle(
-                                fontSize: 40, fontWeight: FontWeight.bold),
+                                fontSize: 40,
+                                color: AppColor.titleBlue,
+                                fontWeight: FontWeight.bold),
                           ),
                           // SizedBox(height: size.height * 0.02),
                         ],

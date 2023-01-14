@@ -26,7 +26,10 @@ class ImageData extends StatelessWidget {
         SizedBox(
           height: size.height * 0.01,
         ),
-        Text(data),
+        Text(
+          data,
+          style: const TextStyle(color: AppColor.snowWhite),
+        ),
         Text(
           label,
           style: const TextStyle(color: AppColor.grey),

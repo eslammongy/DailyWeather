@@ -10,7 +10,7 @@ class WeatherProvider extends ChangeNotifier {
 
   double _longitude = 0.0;
   double get longitude => _longitude;
-
+  WeatherServices services = WeatherServices();
   getUserLocationData() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     LocationPreferences locationPreferences =
@@ -21,12 +21,17 @@ class WeatherProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<WeatherModel>? _weatherModels = [];
-  List<WeatherModel> get weatherModels => _weatherModels!;
+  List<WeatherModel>? _listWeatherModel = [];
+  List<WeatherModel> get listWeatherModel => _listWeatherModel!;
 
-  getWeatherInfo() async {
-    WeatherServices services = WeatherServices();
-    _weatherModels = await services.getCurrentWeatherByLocation(
+  getWeatherInfoByLatLang() async {
+    _listWeatherModel!.clear();
+    _listWeatherModel = await services.getCurrentWeatherByLocation(
         lat: _latitude, long: _longitude);
+  }
+
+  getWeatherInfoByCityName(String city) async {
+    _listWeatherModel = await services.getCurrentWeatherData(cityName: city);
+    notifyListeners();
   }
 }

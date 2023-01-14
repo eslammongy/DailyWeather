@@ -2,10 +2,12 @@
 
 import 'package:daily_weather/models/weather_model.dart';
 import 'package:daily_weather/screens/search/search_screen.dart';
+import 'package:daily_weather/utils/app_colors.dart';
 import 'package:daily_weather/utils/location_prefs.dart';
 import 'package:daily_weather/utils/location_service.dart';
 import 'package:daily_weather/widgets/weather_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/weather_provider.dart';
@@ -37,20 +39,36 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     var provider = Provider.of<WeatherProvider>(context, listen: true);
 
-    //print("Provider -> ${provider.latitude}..${provider.longitude}");
     return Scaffold(
+        backgroundColor: Colors.grey[850],
         appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.white,
+            statusBarColor: Colors.grey[900], // You can use this as well
+            statusBarIconBrightness:
+                Brightness.light, // OR Vice Versa for ThemeMode.dark
+            statusBarBrightness: Brightness.light,
+          ),
+          backgroundColor: Colors.grey[900],
+          elevation: 5,
           actions: [
             IconButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  provider.listWeatherModel.clear();
                   return SearchScreen();
                 }));
               },
-              icon: const Icon(Icons.search),
+              icon: Icon(
+                Icons.search,
+                color: AppColor.titleBlue,
+              ),
             ),
           ],
-          title: const Text('DailyWeather'),
+          title: Text(
+            'DailyWeather',
+            style: TextStyle(color: AppColor.titleBlue),
+          ),
         ),
         body: provider.latitude == 0.0
             ? Center(
@@ -98,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     )),
               )
-            : const CurrentWeatherContainer());
+            : CurrentWeatherContainer(fetchMethod: "LatLang"));
   }
 
   initialLocationServices() async {

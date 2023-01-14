@@ -1,6 +1,7 @@
 import 'package:daily_weather/services/weather_services.dart';
 import 'package:daily_weather/widgets/weather_info.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/weather_provider.dart';
@@ -18,19 +19,29 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<WeatherProvider>(context);
-    provider.weatherModels.clear();
+    print(
+        "CityName -> $cityName Weather List Model Size -> ${provider.listWeatherModel.length}");
     return Scaffold(
         appBar: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+            systemNavigationBarColor: Colors.white,
+            statusBarColor: Colors.grey[800], // You can use this as well
+            statusBarIconBrightness:
+                Brightness.light, // OR Vice Versa for ThemeMode.dark
+            statusBarBrightness: Brightness.light,
+          ),
+          backgroundColor: Colors.grey[800],
+          elevation: 0.3,
           title: const Text('search a city'),
         ),
-        body: provider.weatherModels.isEmpty
+        body: provider.listWeatherModel.isEmpty
             ? Container(
                 margin:
                     const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
                 child: TextField(
                   onSubmitted: ((value) {
                     cityName = value;
-                    services.getCurrentWeatherData(cityName: cityName!);
+                    provider.getWeatherInfoByCityName(cityName!);
                   }),
                   decoration: const InputDecoration(
                       suffixIcon: Icon(Icons.search),
@@ -41,6 +52,6 @@ class _SearchScreenState extends State<SearchScreen> {
                       border: OutlineInputBorder()),
                 ),
               )
-            : const CurrentWeatherContainer());
+            : Container());
   }
 }

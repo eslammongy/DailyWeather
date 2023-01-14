@@ -33,6 +33,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^0.13.5
+  intl: ^0.18.0
   location: ^4.4.0
   provider: ^6.0.5
   shared_preferences: ^2.0.15
@@ -50,7 +51,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
-  # To add assets to your application, add an assets section, like this:
+  # To add assets toPP your application, add an assets section, like this:
   assets:
     - assets/images/
   #   - images/a_dot_ham.jpeg

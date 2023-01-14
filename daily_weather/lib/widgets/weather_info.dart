@@ -4,6 +4,7 @@ import 'package:daily_weather/models/weather_model.dart';
 import 'package:daily_weather/providers/weather_provider.dart';
 import 'package:daily_weather/widgets/image_data.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../utils/app_colors.dart';
@@ -17,16 +18,6 @@ class CurrentWeatherContainer extends StatefulWidget {
 }
 
 class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
-  @override
-  void initState() {
-    super.initState();
-    //getCurrentWeatherInfo();
-  }
-
-  getCurrentWeatherInfo() async {
-    await Provider.of<WeatherProvider>(context, listen: false).getWeatherInfo();
-  }
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
@@ -61,24 +52,25 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Cairo',
+                      dailyForecast[0].cityName ?? 'Cairo',
                       style: const TextStyle(
                           color: AppColor.lightBlack, fontSize: 22),
                     ),
                     Text(
-                      dailyForecast[0].dtTxt ?? "12/05/2022",
+                      DateFormat.MMMMEEEEd()
+                          .format(DateTime.parse(dailyForecast[0].dtTxt!)),
                       style:
                           const TextStyle(color: AppColor.grey, fontSize: 15),
                     ),
                     Image.asset('assets/images/02n.png'),
                     Text(
-                      dailyForecast[0].description ?? 'Cloudy',
+                      dailyForecast[0].main ?? 'Cloudy',
                       style: const TextStyle(
                           color: AppColor.lightBlack, fontSize: 20),
                     ),
                     SizedBox(height: size.height * 0.02),
                     Text(
-                      dailyForecast[0].temp.toString(),
+                      "${dailyForecast[0].temp!.round().toString()}ºC",
                       style:
                           TextStyle(fontSize: 45, fontWeight: FontWeight.bold),
                     ),
@@ -91,7 +83,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                           height: 35,
                         ),
                         Text(
-                          '68°',
+                          "${dailyForecast[0].maxTemp!.round().toString()}ºC",
                           style: const TextStyle(
                               color: AppColor.grey, fontSize: 18),
                         ),
@@ -101,7 +93,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                           height: 35,
                         ),
                         Text(
-                          '52°',
+                          '${dailyForecast[0].minTemp!.round().toString()}ºC',
                           style: const TextStyle(
                               color: AppColor.grey, fontSize: 18),
                         ),
@@ -113,17 +105,17 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                       children: [
                         ImageData(
                           aseetPath: 'assets/images/w.png',
-                          data: '12Km/h',
+                          data: '${dailyForecast[0].windSpeed.toString()}Km/h',
                           label: 'Wind',
                         ),
                         ImageData(
-                          aseetPath: 'assets/images/c.png',
-                          data: '22%',
-                          label: 'Clouds',
+                          aseetPath: 'assets/images/atmospheric.png',
+                          data: '${dailyForecast[0].pressure}hPa',
+                          label: 'pressure',
                         ),
                         ImageData(
                           aseetPath: 'assets/images/hu.png',
-                          data: '22%',
+                          data: '${dailyForecast[0].humidity}%',
                           label: 'Humidity',
                         )
                       ],
@@ -131,42 +123,56 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                   ],
                 ),
               ),
-              Container(
-                width: 200,
-                height: size.height * 0.35,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(31, 162, 162, 162),
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      '12/05/2022',
-                      style: const TextStyle(
-                          color: AppColor.lightBlack, fontSize: 15),
-                    ),
-                    Image.asset(
-                      'assets/images/02n.png',
-                      width: 100,
-                    ),
-                    Text(
-                      'Cloudy',
-                      style: const TextStyle(
-                          color: AppColor.lightBlack, fontSize: 20),
-                    ),
-                    SizedBox(height: size.height * 0.02),
-                    Text(
-                      '96°',
-                      style:
-                          TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
-                    ),
-                    // SizedBox(height: size.height * 0.02),
-                  ],
+              Expanded(
+                child: ListView.builder(
+                  itemCount: 6,
+                  shrinkWrap: true,
+                  physics: BouncingScrollPhysics(),
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (BuildContext context, index) {
+                    var date = DateTime.fromMillisecondsSinceEpoch(
+                        dailyForecast[index].time! * 1000);
+                    var formattedDate = DateFormat.MMMMEEEEd().format(date);
+
+                    return Container(
+                      width: 200,
+                      height: size.height * 0.35,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(31, 162, 162, 162),
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            formattedDate,
+                            style: const TextStyle(
+                                color: AppColor.lightBlack, fontSize: 15),
+                          ),
+                          Image.asset(
+                            'assets/images/02n.png',
+                            width: 100,
+                          ),
+                          Text(
+                            dailyForecast[index].main ?? 'Cloudy',
+                            style: const TextStyle(
+                                color: AppColor.lightBlack, fontSize: 20),
+                          ),
+                          SizedBox(height: size.height * 0.02),
+                          Text(
+                            "${dailyForecast[index].temp!.round()}ºC",
+                            style: TextStyle(
+                                fontSize: 40, fontWeight: FontWeight.bold),
+                          ),
+                          // SizedBox(height: size.height * 0.02),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

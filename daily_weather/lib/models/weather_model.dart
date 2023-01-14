@@ -1,11 +1,10 @@
-import 'dart:ffi';
-
 class WeatherModel {
   int? id;
   int? time;
   String? dtTxt;
   int? sunrise;
   int? sunset;
+  int? pressure;
   int? humidity;
   String? description;
   String? iconCode;
@@ -22,6 +21,7 @@ class WeatherModel {
       this.time,
       this.sunrise,
       this.sunset,
+      this.pressure,
       this.humidity,
       this.description,
       this.iconCode,
@@ -43,11 +43,12 @@ class WeatherModel {
       description: weather['description'],
       iconCode: weather['icon'],
       main: weather['main'],
-      cityName: json['name'],
+      cityName: json['city'],
       temp: json['main']['temp'],
       maxTemp: json['main']['temp_max'],
       minTemp: json['main']['temp_min'],
-      sunrise: json['sys']['sunrise'],
+      sunrise: json['city']['sunrise'],
+      pressure: json['main']['pressure'],
       sunset: json['sys']['sunset'],
       humidity: json['main']['humidity'],
       windSpeed: json['wind']['speed'],
@@ -58,14 +59,18 @@ class WeatherModel {
     final weathers = <WeatherModel>[];
     for (final item in json['list']) {
       weathers.add(WeatherModel(
-        time: item['dt'],
-        dtTxt: item['dt_txt'],
-        temp: item['main']['temp'],
-        maxTemp: item['main']['temp_max'],
-        minTemp: item['main']['temp_min'],
-        description: item['weather'][0]['description'],
-        main: item['weather'][0]['main'],
-      ));
+          time: item['dt'],
+          dtTxt: item['dt_txt'],
+          temp: item['main']['temp'],
+          maxTemp: item['main']['temp_max'],
+          minTemp: item['main']['temp_min'],
+          description: item['weather'][0]['description'],
+          main: item['weather'][0]['main'],
+          humidity: item['main']['humidity'],
+          windSpeed: item['wind']['speed'],
+          sunrise: json['city']['sunrise'],
+          pressure: item['main']['pressure'],
+          cityName: json['city']['name']));
     }
     return weathers;
   }

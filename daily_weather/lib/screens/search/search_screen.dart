@@ -36,33 +36,37 @@ class _SearchScreenState extends State<SearchScreen> {
           title: const Text('search a city'),
         ),
         body: provider.cityName == null
-            ? Container(
-                margin:
-                    const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-                child: TextField(
-                  onSubmitted: ((value) {
-                    setState(() {
-                      provider.cityName = value;
-                    });
-                  }),
-                  decoration: InputDecoration(
-                    suffixIcon: Icon(Icons.search, color: Colors.grey[500]),
-                    fillColor: Colors.grey[700],
-                    contentPadding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 20),
-                    label: Text(
-                      'search',
-                      style: TextStyle(color: Colors.grey[500]),
-                    ),
-                    hintText: 'enter city name',
-                    hintStyle: const TextStyle(color: AppColor.grey),
-                    enabledBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                          width: 2, color: Colors.blue), //<-- SEE HERE
+            ? SingleChildScrollView(
+              child: Container(
+                  margin:
+                      const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                  child: TextField(
+                    onSubmitted: ((value) {
+                      setState(() {
+                        provider.cityName = value;
+                      });
+                    }),
+                    style: const TextStyle(color: AppColor.white),
+                    decoration: InputDecoration(
+                      suffixIcon: Icon(Icons.search, color: Colors.grey[500]),
+                      fillColor: Colors.grey[700],
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 20),
+                      label: Text(
+                        'search',
+                        style: TextStyle(color: Colors.grey[500]),
+                      ),
+                      hintText: 'enter city name',
+
+                      hintStyle: const TextStyle(color: AppColor.grey),
+                      enabledBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                            width: 2, color: Colors.blue), //<-- SEE HERE
+                      ),
                     ),
                   ),
                 ),
-              )
+            )
             : CurrentWeatherContainer(fetchMethod: provider.cityName!));
   }
 }

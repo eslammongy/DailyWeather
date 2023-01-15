@@ -42,10 +42,13 @@ class WeatherProvider extends ChangeNotifier {
   List<WeatherModel> _listWeatherModel = [];
   List<WeatherModel> get listWeatherModel => _listWeatherModel;
 
+  List<WeatherModel> _listWeatherModelLatLang = [];
+  List<WeatherModel> get listWeatherModelLatLang => _listWeatherModelLatLang;
+
   getWeatherInfoByLatLang() async {
     _listWeatherModel.clear();
     try {
-      _listWeatherModel = await services.getCurrentWeatherByLocation(
+      _listWeatherModelLatLang = await services.getCurrentWeatherByLocation(
           lat: _latitude, long: _longitude);
     } on SocketException {
       throw Failure('No Internet connection 😑');

@@ -37,9 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<WeatherProvider>(context, listen: true);
-    // provider.getUserLocationData();
-    print(
-        "Provider build context -> ${provider.latitude}..${provider.longitude}");
+
     return Scaffold(
         backgroundColor: Colors.grey[900],
         appBar: AppBar(
@@ -118,7 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     )),
               )
-            : CurrentWeatherContainer(fetchMethod: "LatLang"));
+            : CurrentWeatherContainer(fetchMethod: "UserLocation"));
   }
 
   initialLocationServices() async {

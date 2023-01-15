@@ -37,6 +37,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<WeatherProvider>(context, listen: true);
+    // provider.getUserLocationData();
     print(
         "Provider build context -> ${provider.latitude}..${provider.longitude}");
     return Scaffold(

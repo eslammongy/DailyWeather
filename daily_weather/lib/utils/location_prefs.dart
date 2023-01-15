@@ -15,12 +15,12 @@ class LocationPreferences {
         "The location data saved successfully in shared preference:: $lat .. $long");
   }
 
-  getLocationLatitude() async {
+  Future<double> getLocationLatitude() async {
     double latitude = sharedPreferences.getDouble('LocationLatitude') ?? 0.0;
     return latitude;
   }
 
-  getLocationLongitude() async {
+  Future<double> getLocationLongitude() async {
     double longitude = sharedPreferences.getDouble('LocationLongitude') ?? 0.0;
     return longitude;
   }

@@ -29,9 +29,14 @@ class WeatherProvider extends ChangeNotifier {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     LocationPreferences locationPreferences =
         LocationPreferences(sharedPreferences: sharedPreferences);
-    _latitude = await locationPreferences.getLocationLatitude();
-    _longitude = await locationPreferences.getLocationLatitude();
-    print("Provider -> $_latitude..$_longitude");
+    await locationPreferences.getLocationLatitude().then((value) {
+      _latitude = value;
+    });
+    await locationPreferences.getLocationLatitude().then((value) {
+      _longitude = value;
+      print("Provider -> $_latitude..$_longitude");
+      notifyListeners();
+    });
   }
 
   List<WeatherModel> _listWeatherModel = [];

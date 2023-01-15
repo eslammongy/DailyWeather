@@ -1,7 +1,11 @@
 // ignore_for_file: prefer_const_constructors, must_be_immutable
 
+import 'dart:io';
+
 import 'package:daily_weather/utils/utils.dart';
+import 'package:daily_weather/widgets/error_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:daily_weather/providers/weather_provider.dart';
@@ -9,7 +13,7 @@ import 'package:daily_weather/widgets/image_data.dart';
 import '../utils/app_colors.dart';
 
 class CurrentWeatherContainer extends StatefulWidget {
-  String fetchMethod = "LatLang";
+  String fetchMethod;
   CurrentWeatherContainer({
     Key? key,
     required this.fetchMethod,
@@ -21,7 +25,6 @@ class CurrentWeatherContainer extends StatefulWidget {
 }
 
 class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
-  String fetchMethod = "LatLang";
   var today = DateTime.now();
   var formattedDate = "Saturday, Jan,12";
   @override
@@ -30,15 +33,14 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
     var provider = Provider.of<WeatherProvider>(context);
 
     return FutureBuilder(
-      future: fetchMethod == 'LatLang'
+      future: widget.fetchMethod == 'LatLang'
           ? provider.getWeatherInfoByLatLang()
-          : provider.getWeatherInfoByCityName(fetchMethod),
+          : provider.getWeatherInfoByCityName(widget.fetchMethod),
       builder: (context, snapshot) {
         var dailyForecast = provider.listWeatherModel;
+
         if (snapshot.hasError) {
-          return const Center(
-            child: Text("Opps! Try again later!"),
-          );
+          return CustomErrorWidget(error_msg: snapshot.error.toString());
         }
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -52,7 +54,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 decoration: BoxDecoration(
-                  color: Colors.grey[800],
+                  color: Colors.grey[850],
                   borderRadius: BorderRadius.circular(15),
                 ),
                 child: Column(
@@ -145,7 +147,7 @@ class _CurrentWeatherContainerState extends State<CurrentWeatherContainer> {
 
                     return Container(
                       width: 200,
-                      height: size.height * 0.3,
+                      height: size.height * 0.25,
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       margin: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),

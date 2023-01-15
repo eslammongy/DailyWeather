@@ -1,6 +1,5 @@
 // ignore_for_file: avoid_print
 
-import 'package:daily_weather/models/weather_model.dart';
 import 'package:daily_weather/screens/search/search_screen.dart';
 import 'package:daily_weather/utils/app_colors.dart';
 import 'package:daily_weather/utils/location_prefs.dart';
@@ -38,9 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     var provider = Provider.of<WeatherProvider>(context, listen: true);
-
+    print(
+        "Provider build context -> ${provider.latitude}..${provider.longitude}");
     return Scaffold(
-        backgroundColor: Colors.grey[850],
+        backgroundColor: Colors.grey[900],
         appBar: AppBar(
           systemOverlayStyle: SystemUiOverlayStyle(
             systemNavigationBarColor: Colors.white,
@@ -50,13 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
             statusBarBrightness: Brightness.light,
           ),
           backgroundColor: Colors.grey[900],
-          elevation: 5,
+          elevation: 3,
           actions: [
             IconButton(
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   provider.listWeatherModel.clear();
-                  return SearchScreen();
+                  provider.cityName = null;
+                  return const SearchScreen();
                 }));
               },
               icon: Icon(
@@ -81,8 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           'searching now 🔍 or give me access on your location please 😔 to start..',
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 25,
-                          ),
+                              fontSize: 25, color: AppColor.snowWhite),
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 40),
@@ -98,9 +98,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                         _isServiceEnabled)
                                     .then((locationData) {
                                   if (locationData.latitude != null) {
-                                    /*   print(
-                                        "Returned location data from dereferences"); */
-                                    provider.getUserLocationData();
+                                    provider.setLatitude =
+                                        locationData.latitude!;
+                                    provider.setLongitude =
+                                        locationData.longitude!;
                                   }
                                 });
                               }

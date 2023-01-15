@@ -6,6 +6,7 @@ import 'package:daily_weather/models/weather_model.dart';
 import 'package:daily_weather/utils/utils.dart';
 import 'package:http/http.dart' as http_client;
 
+/*  */
 class WeatherServices {
   Future<List<WeatherModel>> getCurrentWeatherData(
       {required String cityName}) async {

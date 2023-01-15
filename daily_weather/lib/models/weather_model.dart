@@ -10,7 +10,7 @@ class WeatherModel {
   String? iconCode;
   String? main;
   String? cityName;
-  dynamic? windSpeed;
+  dynamic windSpeed;
   double? temp;
   double? maxTemp;
   double? minTemp;
